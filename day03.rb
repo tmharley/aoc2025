@@ -18,24 +18,12 @@ def parse_input(input)
   end
 end
 
-def part_one(input)
-  banks = parse_input(input)
-  banks.map do |bank|
-    first_battery = nil
-    9.downto(1) do |i|
-      first_battery = bank[...-1].index(i)
-      break if first_battery
-    end
-    bank[first_battery] * 10 + bank[(first_battery + 1)..].max
-  end.sum
-end
-
-def part_two(input)
+def build(input, num_batteries = 2)
   banks = parse_input(input)
   banks.map do |bank|
     value = 0
     cutoff = 0
-    12.downto(1) do |i|
+    num_batteries.downto(1) do |i|
       first_battery = nil
       9.downto(1) do |j|
         first_battery = bank[cutoff..-i].index(j)
@@ -46,6 +34,14 @@ def part_two(input)
     end
     value
   end.sum
+end
+
+def part_one(input)
+  build(input, 2)
+end
+
+def part_two(input)
+  build(input, 12)
 end
 
 p part_one(TEST_INPUT) # should be 357
