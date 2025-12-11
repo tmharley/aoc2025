@@ -48,7 +48,7 @@ end
 def traverse(devices, label, destination = 'out', valid_list = nil)
   device = devices[label]
   device[:value] += 1
-  return if label == destination || label == 'out'
+  return if label == destination
   device[:outputs].each do |output|
     next unless valid_list.nil? || valid_list.include?(output)
     traverse(devices, output, destination, valid_list)
@@ -56,8 +56,7 @@ def traverse(devices, label, destination = 'out', valid_list = nil)
 end
 
 def num_paths(devices, start, finish)
-  valid_list = Set.new
-  valid_list << finish
+  valid_list = Set.new << finish
   loop do
     num_valid = valid_list.length
     devices.each do |k, v|
@@ -71,17 +70,16 @@ end
 
 def part_one(input)
   devices = setup_devices(input)
-  traverse(devices, 'you')
-  devices['out'][:value]
+  num_paths(devices, 'you', 'out')
 end
 
 def part_two(input)
   devices = setup_devices(input)
-  paths = num_paths(devices, 'svr', 'fft')
-  devices.each {|_, v| v[:value] = 0}
-  paths *= num_paths(devices, 'fft', 'dac')
-  devices.each {|_, v| v[:value] = 0}
-  paths * num_paths(devices, 'dac', 'out')
+  main_nodes = %w[svr fft dac out]
+  (1...main_nodes.length).map do |i|
+    devices[main_nodes[i-1]][:value] = 0
+    num_paths(devices, main_nodes[i-1], main_nodes[i])
+  end.reduce(:*)
 end
 
 p part_one(TEST_INPUT) # should be 5
